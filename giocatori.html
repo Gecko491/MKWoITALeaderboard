@@ -8,7 +8,6 @@
   <header>
     <h1>Mario Kart World – Giocatori</h1>
     <p>Elenco dei giocatori partecipanti</p>
-
     <nav style="margin-top: 10px;">
       <ul style="list-style: none; padding: 0; display: flex; gap: 20px;">
         <li><a href="classifica.html">Classifica</a></li>
@@ -28,12 +27,13 @@
       </tr>
     </table>
 
-    <h3>Aggiungi un nuovo giocatore</h3>
-    <form id="formAggiunta">
+    <h2>Aggiungi un giocatore</h2>
+    <form id="playerForm">
       <label for="nome">Nome giocatore:</label>
-      <input type="text" id="nome" required />
-      <button type="submit">Aggiungi</button>
+      <input type="text" id="nome" name="nome" required />
+      <button type="submit">Invia</button>
     </form>
+    <p id="response" style="margin-top: 10px;"></p>
   </main>
 
   <footer>
@@ -42,10 +42,9 @@
 
   <script>
     const tabella = document.getElementById('giocatori');
-    const form = document.getElementById('formAggiunta');
+    const form = document.getElementById('playerForm');
     const inputNome = document.getElementById('nome');
 
-    // Carica i giocatori da LocalStorage o usa lista iniziale
     function caricaGiocatori() {
       const dati = localStorage.getItem('giocatori');
       if (dati) {
@@ -62,7 +61,6 @@
       }
     }
 
-    // Aggiunge una riga con dati e bottone elimina
     function aggiungiRiga(index, nome) {
       const riga = tabella.insertRow();
       const cellaNum = riga.insertCell(0);
@@ -72,7 +70,6 @@
       cellaNum.textContent = index + 1;
       cellaNome.textContent = nome;
 
-      // Bottone elimina
       const btnElimina = document.createElement('button');
       btnElimina.textContent = 'Rimuovi';
       btnElimina.addEventListener('click', () => {
@@ -81,31 +78,25 @@
       cellaAzioni.appendChild(btnElimina);
     }
 
-    // Salva array giocatori in LocalStorage
     function salvaGiocatori(arrayGiocatori) {
       localStorage.setItem('giocatori', JSON.stringify(arrayGiocatori));
     }
 
-    // Rimuove giocatore per indice e aggiorna tabella
     function rimuoviGiocatore(index) {
       let giocatori = JSON.parse(localStorage.getItem('giocatori')) || [];
-      giocatori.splice(index, 1); // rimuove l'elemento
+      giocatori.splice(index, 1);
       salvaGiocatori(giocatori);
       aggiornaTabella();
     }
 
-    // Pulisce e ricarica la tabella aggiornata
     function aggiornaTabella() {
-      // Rimuove tutte le righe tranne l'intestazione (prima riga)
       while (tabella.rows.length > 1) {
         tabella.deleteRow(1);
       }
-      // Ricarica i dati
       caricaGiocatori();
     }
 
-    // Gestisce l'invio del form per aggiungere
-    form.addEventListener('submit', function (e) {
+    form.addEventListener('submit', function(e) {
       e.preventDefault();
 
       const nome = inputNome.value.trim();
@@ -114,12 +105,25 @@
       let giocatori = JSON.parse(localStorage.getItem('giocatori')) || [];
       giocatori.push(nome);
       salvaGiocatori(giocatori);
-
       aggiornaTabella();
+
+      fetch("https://script.google.com/macros/s/AKfycbyFNwNabQfOfsIcdIsfj3K9WczQwrfJSfbEYWQn7GvulFhVh8HywkWxpH3QbxZ1vxW2CQ/exec", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nome: nome })
+      })
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById("response").innerText = data;
+      })
+      .catch(error => {
+        console.error("Errore:", error);
+        document.getElementById("response").innerText = "Errore nell'invio.";
+      });
+
       form.reset();
     });
 
-    // Carica dati quando la pagina viene caricata
     caricaGiocatori();
   </script>
 </body>
