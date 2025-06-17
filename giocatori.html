@@ -108,18 +108,19 @@
       aggiornaTabella();
 
       fetch("https://script.google.com/macros/s/AKfycbyFNwNabQfOfsIcdIsfj3K9WczQwrfJSfbEYWQn7GvulFhVh8HywkWxpH3QbxZ1vxW2CQ/exec", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nome: nome })
-      })
-      .then(response => response.text())
-      .then(data => {
-        document.getElementById("response").innerText = data;
-      })
-      .catch(error => {
-        console.error("Errore:", error);
-        document.getElementById("response").innerText = "Errore nell'invio.";
-      });
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ nome: nome })
+})
+.then(response => response.text())
+.then(data => {
+  document.getElementById("response").innerText = data;
+})
+.catch(error => {
+  console.error("Errore:", error);
+  document.getElementById("response").innerText = "Errore nell'invio.";
+});
+
 
       form.reset();
     });
